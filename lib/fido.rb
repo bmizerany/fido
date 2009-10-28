@@ -1,12 +1,18 @@
 require 'fileutils'
 require 'recho'
+require 'logger'
+require 'open3'
 
-module Fido
-  extend FileUtils
+class Fido
+  include FileUtils
 
-  class << self ; attr_accessor :verbose ; end
+  attr_accessor :logger
 
-  def self.clone(repo, *to)
+  def initialize(logger = Logger.new(open('/dev/null', 'w')))
+    @logger = logger
+  end
+
+  def clone(repo, *to)
     to << "master"
 
     dir = File.basename(repo, ".git")
@@ -34,11 +40,15 @@ module Fido
     end
   end
 
-  def self.cmd(c)
-    puts(c) if verbose
-    out = `#{c}`
-    print(out) if verbose
-    fail(out) if $? != 0
+  def cmd(c)
+    out, err = nil
+    @logger.debug "---> Executing: #{c}"
+    Open3.popen3(c) do |_i, o, e|
+      out = o.read
+      err = e.read
+    end
+    @logger.debug "---> Output\n#{out}" unless out.chomp.empty?
+    @logger.error "---> Error\n#{out}"  unless err.chomp.empty?
     out
   end
 end

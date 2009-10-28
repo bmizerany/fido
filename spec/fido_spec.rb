@@ -9,22 +9,30 @@ include FileUtils
 describe "Fido" do
 
   before do
-    Fido.verbose = true
+    @fido = if $DEBUG
+      Fido.new(Logger.new(STDOUT))
+    else
+      Fido.new
+    end
+
     @pwd = pwd
+
     mkdir_p TestRepo
+
     cd TestRepo do
       `git init`
       echo("foo!") > "FOO"
       `git add FOO`
       `git commit -m 'foo'`
     end
+
     cd GitDir
   end
 
   after { cd @pwd ; rm_rf GitDir }
 
   it "should clone a repo and leave it at master by default" do
-    Fido.clone(TestRepo)
+    @fido.clone(TestRepo)
     cd "test-repo" do
       `git branch`.should =~ /\* master/
     end
@@ -34,7 +42,7 @@ describe "Fido" do
     cd TestRepo do
       `git branch first`
     end
-    Fido.clone(TestRepo, "first")
+    @fido.clone(TestRepo, "first")
     cd "test-repo" do
       `git branch`.should =~ /\* first/
     end
@@ -44,7 +52,7 @@ describe "Fido" do
     cd TestRepo do
       `git branch second`
     end
-    Fido.clone(TestRepo, "first", "second")
+    @fido.clone(TestRepo, "first", "second")
     cd "test-repo" do
       `git branch`.should =~ /\* second/
     end
@@ -59,7 +67,7 @@ describe "Fido" do
       `git commit -m 'foo'`
       `git branch second`
     end
-    Fido.clone(TestRepo, "first", "second")
+    @fido.clone(TestRepo, "first", "second")
     cd "test-repo" do
       `git branch`.should =~ /\* second/
     end
