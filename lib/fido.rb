@@ -4,6 +4,8 @@ require 'recho'
 module Fido
   extend FileUtils
 
+  class << self ; attr_accessor :verbose ; end
+
   def self.clone(repo, *to)
     cmd "git clone #{repo}"
     cd File.basename(repo, ".git") do
@@ -18,6 +20,7 @@ module Fido
 
   def self.cmd(c)
     out = `#{c}`
+    print(out) if verbose
     fail(out) if $? != 0
     out
   end
