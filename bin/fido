@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.dirname(__FILE__) + "/../lib"
+require 'optparse'
+require 'fido'
+
+Fido.verbose = true
+
+ARGV.options do |o|
+  o.banner = "Usage: fido git://github.com/sinatra/sinatra.git work bug123"
+  o.separator "\n"
+  o.separator "  This example will clone sinatra.git and checkout"
+  o.separator "  to work if origin/work exists otherwise origin/bug123"
+  o.separator "  or origin/master (implied)"
+  o.separator "\n"
+  o.on_tail("-h", "--help", "Show this message") { abort(o.to_s) }
+  o.on_tail("-s", "--silent", "Silence command output") { Fido.verbose = false }
+  o.parse!
+
+  abort(o.to_s) if ARGV.size < 2
+end
+
+Fido.clone(*ARGV)
+
+#vim: syn=ruby
