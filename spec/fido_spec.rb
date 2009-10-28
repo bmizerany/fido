@@ -9,6 +9,7 @@ include FileUtils
 describe "Fido" do
 
   before do
+    Fido.verbose = true
     @pwd = pwd
     mkdir_p TestRepo
     cd TestRepo do
@@ -41,6 +42,21 @@ describe "Fido" do
 
   it "should checkout the second branch if first is not available" do
     cd TestRepo do
+      `git branch second`
+    end
+    Fido.clone(TestRepo, "first", "second")
+    cd "test-repo" do
+      `git branch`.should =~ /\* second/
+    end
+  end
+
+  it "should checkout the local branch if exists" do
+    mkdir "test-repo"
+    cd "test-repo" do
+      `git init`
+      echo("foo") > "FOO"
+      `git add FOO`
+      `git commit -m 'foo'`
       `git branch second`
     end
     Fido.clone(TestRepo, "first", "second")
