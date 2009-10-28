@@ -39,4 +39,14 @@ describe "Fido" do
     end
   end
 
+  it "should checkout the second branch if first is not available" do
+    cd TestRepo do
+      `git branch second`
+    end
+    Fido.clone(TestRepo, "first", "second")
+    cd "test-repo" do
+      `git branch`.should =~ /\* second/
+    end
+  end
+
 end
