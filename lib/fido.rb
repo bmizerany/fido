@@ -47,8 +47,8 @@ class Fido
       out = o.read
       err = e.read
     end
-    @logger.debug "---> Output\n#{out}" unless out.chomp.empty?
-    @logger.error "---> Error\n#{out}"  unless err.chomp.empty?
+    @logger.debug "---> Output\n#{out}" if out !~ /^\s*$/
+    @logger.debug "---> Error\n#{err}"  if err !~ /^\s*$/
     out
   end
 end
