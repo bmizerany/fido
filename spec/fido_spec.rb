@@ -1,5 +1,6 @@
 $LOAD_PATH.unshift File.dirname(__FILE__) + "/../lib"
 require 'fido'
+require 'recho'
 
 GitDir = File.expand_path(File.dirname(__FILE__) + "/git")
 TestRepo = GitDir + "/test-repo.git"

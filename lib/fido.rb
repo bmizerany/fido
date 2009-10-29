@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'recho'
 require 'logger'
 require 'open3'
 
