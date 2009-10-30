@@ -74,4 +74,10 @@ describe "Fido" do
     end
   end
 
+  it "should drop a FIDO file one clone" do
+    @fido.clone(TestRepo)
+    cd "test-repo" do
+      File.exists?(".git/FIDO").should == true
+    end
+  end
 end

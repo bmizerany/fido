@@ -32,18 +32,19 @@ class Fido
           break
         end
       end
+      touch ".git/FIDO"
     end
   end
 
   def cmd(c)
     out, err = nil
-    @logger.debug "---> Executing: #{c}"
+    @logger.debug c
     Open3.popen3(c) do |_i, o, e|
       out = o.read
       err = e.read
     end
-    @logger.debug "---> Output\n#{out}" if out !~ /^\s*$/
-    @logger.debug "---> Error\n#{err}"  if err !~ /^\s*$/
+    @logger.debug out if out !~ /^\s*$/
+    @logger.error err if err !~ /^\s*$/
     out
   end
 end
