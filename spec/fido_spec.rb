@@ -32,14 +32,14 @@ describe "Fido" do
 
   after { cd @pwd ; rm_rf GitDir }
 
-  it "should clone a repo and leave it at master by default" do
+  it "clones a repo and leaves it at master by default" do
     @fido.clone(TestRepo)
     cd "test-repo" do
       `git branch`.should =~ /\* master/
     end
   end
 
-  it "should checkout the first branch if available" do
+  it "does a checkout of the first branch if available" do
     cd TestRepo do
       `git branch first`
     end
@@ -49,7 +49,7 @@ describe "Fido" do
     end
   end
 
-  it "should checkout the second branch if first is not available" do
+  it "does a checkout of the second branch if first is not available" do
     cd TestRepo do
       `git branch second`
     end
@@ -59,7 +59,7 @@ describe "Fido" do
     end
   end
 
-  it "should checkout the local branch if exists" do
+  it "does a checkout of the local branch if exists" do
     mkdir "test-repo"
     cd "test-repo" do
       `git init`
@@ -74,7 +74,7 @@ describe "Fido" do
     end
   end
 
-  it "should drop a FIDO file one clone" do
+  it "drops a FIDO file one clone" do
     @fido.clone(TestRepo)
     cd "test-repo" do
       File.exists?(".git/FIDO").should == true
