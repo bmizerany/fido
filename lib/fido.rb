@@ -14,6 +14,8 @@ class Fido
     mkdir_p dir
 
     cd dir do
+      return if File.exists?(".git/FIDO")
+
       if !File.exists?(".git")
         cmd "git init"
         cmd "git remote add origin #{repo}"
@@ -32,6 +34,7 @@ class Fido
           break
         end
       end
+
       touch ".git/FIDO"
     end
   end

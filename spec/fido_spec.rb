@@ -80,4 +80,22 @@ describe "Fido" do
       File.exists?(".git/FIDO").should == true
     end
   end
+
+  it "does nothing if .git/FIDO exists" do
+    cd TestRepo do
+      `git branch some-work`
+    end
+
+    @fido.clone(TestRepo)
+
+    cd "test-repo" do
+      `git checkout -b stay-here`
+    end
+
+    @fido.clone(TestRepo, "some-work")
+
+    cd "test-repo" do
+      `git branch`.should =~ /\* stay-here/
+    end
+  end
 end
