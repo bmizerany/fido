@@ -4,6 +4,7 @@ require 'optparse'
 require 'fido'
 
 debug = false
+force = false
 
 ARGV.options do |o|
   o.banner = "Usage: fido git://github.com/sinatra/sinatra.git work bug123"
@@ -12,12 +13,15 @@ ARGV.options do |o|
   o.separator "  to work if origin/work exists otherwise origin/bug123"
   o.separator "  or origin/master (implied)"
   o.separator "\n"
+  o.on_tail("-f", "--force", "destructive fetch") { force = true }
   o.on_tail("-h", "--help", "Show this message") { abort(o.to_s) }
   o.on_tail("-d", "--debug", "Show debug information") { debug = true }
   o.parse!
 
   abort(o.to_s) if ARGV.empty?
 end
+
+ARGV << force if force
 
 if debug
   Fido.new(Logger.new(STDOUT))
