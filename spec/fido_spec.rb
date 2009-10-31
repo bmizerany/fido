@@ -9,6 +9,10 @@ include FileUtils
 
 describe "Fido" do
 
+  def lastSHA
+    `git log --format=%H | head -n1`.chomp
+  end
+
   before do
     @fido = if $DEBUG
       Fido.new(Logger.new(STDOUT))
@@ -59,21 +63,6 @@ describe "Fido" do
     end
   end
 
-  it "does a checkout of the local branch if exists" do
-    mkdir "test-repo"
-    cd "test-repo" do
-      `git init`
-      echo("foo") > "FOO"
-      `git add FOO`
-      `git commit -m 'foo'`
-      `git branch second`
-    end
-    @fido.clone(TestRepo, "first", "second")
-    cd "test-repo" do
-      `git branch`.should =~ /\* second/
-    end
-  end
-
   it "drops a FIDO file one clone" do
     @fido.clone(TestRepo)
     cd "test-repo" do
@@ -89,13 +78,38 @@ describe "Fido" do
     @fido.clone(TestRepo)
 
     cd "test-repo" do
-      `git checkout -b stay-here`
+      `git checkout -b stay-here 2>/dev/null`
     end
 
     @fido.clone(TestRepo, "some-work")
 
     cd "test-repo" do
       `git branch`.should =~ /\* stay-here/
+    end
+  end
+
+  it "will mirror upstream if forced" do
+    sha = nil
+
+    cd TestRepo do
+      echo("foo") >> "FOO"
+      `git add FOO`
+      `git commit -m 'foo'`
+      sha = lastSHA
+    end
+
+    @fido.clone(TestRepo)
+
+    cd "test-repo" do
+      echo("bar") >> "BAR"
+      `git add BAR`
+      `git commit -m 'foo'`
+    end
+
+    @fido.clone(TestRepo, true)
+
+    cd "test-repo" do
+      lastSHA.should == sha
     end
   end
 end

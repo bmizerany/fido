@@ -8,28 +8,30 @@ class Fido
   include Logable
 
   def clone(repo, *to)
+    force = to.last == true && to.pop
     to << "master"
 
     dir = File.basename(repo, ".git")
     mkdir_p dir
 
     cd dir do
-      return if File.exists?(".git/FIDO")
+      return if !force && File.exists?(".git/FIDO")
 
       if !File.exists?(".git")
         cmd "git init"
         cmd "git remote add origin #{repo}"
-        cmd "git fetch origin"
       end
+
+      cmd "git fetch origin"
 
       branches = cmd("git branch -a")
 
       to.each do |branch|
-        if branches =~ /[\* ] #{branch}\n/
-          break if cmd("git branch") =~ /\* #{branch}/
-          cmd "git checkout #{branch}"
+        if branches =~ /\* #{branch}\n/
+          cmd "git reset --hard origin/#{branch}"
           break
         elsif branches =~ /  remotes\/origin\/#{branch}\n/
+          cmd "git branch -D #{branch}" if branches =~ /  #{branch}\n/
           cmd "git checkout -b #{branch} origin/#{branch}"
           break
         end
