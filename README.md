@@ -1,5 +1,9 @@
 # Fido - he fetches
 
+## Install
+
+    gem install fido -s http://gemcutter.org
+
 ## Usage
 
     $ fido git://github.com/sinatra/sinatra.git
@@ -45,7 +49,7 @@ any local work.  He can be told destruction is ok.
       0.3.x
     * 0.9.x
 
-# LICENSE
+## LICENSE
 
 Copyright (c) 2009 Blake Mizerany
 
