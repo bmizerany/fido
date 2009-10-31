@@ -16,7 +16,7 @@ ARGV.options do |o|
   o.on_tail("-d", "--debug", "Show debug information") { debug = true }
   o.parse!
 
-  abort(o.to_s) if ARGV.size < 2
+  abort(o.to_s) if ARGV.empty?
 end
 
 if debug
