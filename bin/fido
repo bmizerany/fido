@@ -9,7 +9,7 @@ force = false
 ARGV.options do |o|
   o.banner = "Usage: fido <git-url> [branch[, work, bug123]]"
   o.separator "\n"
-  o.separator "  This example will clone sinatra.git and checkout"
+  o.separator "  This example will clone <git-url> and checkout"
   o.separator "  to work if origin/work exists otherwise origin/bug123"
   o.separator "  or origin/master (implied)"
   o.separator "\n"
