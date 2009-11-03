@@ -1,11 +1,15 @@
 require 'fileutils'
 require 'open3'
 require 'logger'
-require 'hutils/logable'
 
 class Fido
   include FileUtils
-  include Logable
+
+  attr_accessor :logger
+
+  def initialize(logger=Logger.new("/dev/null"))
+    @logger = logger
+  end
 
   def clone(repo, *to)
     force = to.last == true && to.pop
