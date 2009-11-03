@@ -1,6 +1,5 @@
 require 'fileutils'
 require 'open3'
-require 'logger'
 
 class Fido
   include FileUtils

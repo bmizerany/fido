@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift File.dirname(__FILE__) + "/../lib"
 require 'fido'
 require 'recho'
+require 'logger'
 
 GitDir = File.expand_path(File.dirname(__FILE__) + "/git")
 TestRepo = GitDir + "/test-repo.git"
@@ -10,7 +11,7 @@ include FileUtils
 describe "Fido" do
 
   def lastSHA
-    `git log --format=%H | head -n1`.chomp
+    `git log --format=%h | head -n1`.chomp
   end
 
   before do
