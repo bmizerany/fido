@@ -10,8 +10,8 @@ include FileUtils
 
 describe "Fido" do
 
-  def lastSHA
-    `git log --format=%h | head -n1`.chomp
+  def lastSHA(branch="")
+    `git log --format=%h #{branch} | head -n1`.chomp
   end
 
   before do
@@ -111,6 +111,21 @@ describe "Fido" do
 
     cd "test-repo" do
       lastSHA.should == sha
+    end
+  end
+
+  it "creates a wip backup of changes before destruction" do
+    @fido.clone(TestRepo)
+
+    cd "test-repo" do
+      echo("bar") >> "BAR"
+    end
+
+    @fido.clone(TestRepo, true)
+
+    cd "test-repo" do
+      Dir["BAR"].should.be.empty?
+      `git show fido-backup:BAR`.should == "bar\n"
     end
   end
 end

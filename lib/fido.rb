@@ -4,6 +4,8 @@ require 'open3'
 class Fido
   include FileUtils
 
+  BACKUP_BRANCH = "fido-backup"
+
   attr_accessor :logger
 
   def initialize(logger=Logger.new("/dev/null"))
@@ -26,6 +28,11 @@ class Fido
       end
 
       cmd "git fetch origin"
+
+      cmd "git branch -D #{BACKUP_BRANCH}"
+      cmd "git checkout -b #{BACKUP_BRANCH}"
+      cmd "git add ."
+      cmd "git commit -m 'fido backup'"
 
       branches = cmd("git branch -a")
 
