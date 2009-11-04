@@ -51,15 +51,47 @@ class Fido
     end
   end
 
-  def cmd(c)
-    out, err = nil
-    @logger.debug c
-    Open3.popen3(c) do |_i, o, e|
-      out = o.read
-      err = e.read
+  def sh(cmd)
+    rout, wout = IO.pipe
+    rerr, werr = IO.pipe
+
+    # Disable GC before forking in an attempt to get some advantage
+    # out of COW.
+
+    GC.disable
+
+    if fork
+      # Parent
+      wout.close
+      werr.close
+
+      Process.wait
+
+      exitstatus = $?.exitstatus
+      out = rout.read
+      err = rerr.read
+
+      [out, err, exitstatus]
+    else
+      # Child
+      STDOUT.reopen(wout)
+      STDERR.reopen(werr)
+
+      system(cmd)
+
+      exit! $?.exitstatus
     end
+
+  ensure
+    GC.enable
+  end
+
+  def cmd(c)
+    @logger.debug c
+    out, err, code = sh(c)
     @logger.debug out if out !~ /^\s*$/
     @logger.error err if err !~ /^\s*$/
     out
   end
+
 end
