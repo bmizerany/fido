@@ -51,7 +51,9 @@ class Fido
     end
   end
 
-  def sh(cmd)
+  def sh(cmd, *args)
+    env = args.pop if args.last.kind_of?(Hash)
+
     rout, wout = IO.pipe
     rerr, werr = IO.pipe
 
@@ -74,6 +76,11 @@ class Fido
       [out, err, exitstatus]
     else
       # Child
+
+      if env
+        env.each {|k,v| ENV[k] = v}
+      end
+
       STDOUT.reopen(wout)
       STDERR.reopen(werr)
 
