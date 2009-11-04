@@ -84,7 +84,7 @@ class Fido
       STDOUT.reopen(wout)
       STDERR.reopen(werr)
 
-      system(cmd)
+      system(cmd, *args)
 
       exit! $?.exitstatus
     end
