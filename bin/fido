@@ -22,12 +22,18 @@ ARGV.options do |o|
   abort(o.to_s) if ARGV.empty?
 end
 
-ARGV << force if force
-
-if debug
-  Fido.new(Logger.new(STDOUT))
+fido = if debug
+  logger = Logger.new(STDOUT)
+  logger.level = Logger::DEBUG
+  Fido.new(ARGV.shift, :logger => logger)
 else
-  Fido.new
-end.clone(*ARGV)
+  Fido.new(ARGV.shift)
+end
+
+if force
+  fido.clone!(*ARGV)
+else
+  fido.clone(*ARGV)
+end
 
 #vim: syn=ruby

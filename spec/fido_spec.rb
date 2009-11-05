@@ -7,6 +7,7 @@ GitDir = File.expand_path(File.dirname(__FILE__) + "/git")
 TestRepo = GitDir + "/test-repo.git"
 
 include FileUtils
+include Guns
 
 describe "Fido" do
 
@@ -15,40 +16,38 @@ describe "Fido" do
   end
 
   before do
-    @fido = if $DEBUG
-      Fido.new(Logger.new(STDOUT))
-    else
-      Fido.new
-    end
+
+    rm_rf GitDir
 
     @pwd = pwd
 
     mkdir_p TestRepo
 
+    logger = Logger.new(STDOUT)
+    logger.level = $DEBUG ? Logger::UNKNOWN : Logger::FATAL
+    @fido = Fido.new(TestRepo, :workdir => GitDir, :logger => logger)
+
     cd TestRepo do
-      `git init`
+      sh! "git init"
       echo("foo!") > "FOO"
-      `git add FOO`
-      `git commit -m 'foo'`
+      sh! "git add FOO"
+      sh! "git commit -m 'foo'"
     end
 
     cd GitDir
   end
 
-  after { cd @pwd ; rm_rf GitDir }
+  after { cd @pwd }
 
-  it "clones a repo and leaves it at master by default" do
-    @fido.clone(TestRepo)
-    cd "test-repo" do
-      `git branch`.should =~ /\* master/
-    end
+  it "fails if no branches given" do
+    lambda { @fido.clone }.should.raise RuntimeError
   end
 
   it "does a checkout of the first branch if available" do
     cd TestRepo do
       `git branch first`
     end
-    @fido.clone(TestRepo, "first")
+    @fido.clone("first")
     cd "test-repo" do
       `git branch`.should =~ /\* first/
     end
@@ -58,74 +57,51 @@ describe "Fido" do
     cd TestRepo do
       `git branch second`
     end
-    @fido.clone(TestRepo, "first", "second")
+    @fido.clone("first", "second")
     cd "test-repo" do
       `git branch`.should =~ /\* second/
     end
   end
 
-  it "drops a FIDO file one clone" do
-    @fido.clone(TestRepo)
-    cd "test-repo" do
-      File.exists?(".git/FIDO").should == true
-    end
+  it "returns true if there is a matching remote branches" do
+    @fido.clone("master").should == true
   end
 
-  it "does nothing if .git/FIDO exists" do
-    cd TestRepo do
-      `git branch some-work`
-    end
-
-    @fido.clone(TestRepo)
-
-    cd "test-repo" do
-      `git checkout -b stay-here 2>/dev/null`
-    end
-
-    @fido.clone(TestRepo, "some-work")
-
-    cd "test-repo" do
-      `git branch`.should =~ /\* stay-here/
-    end
+  it "returns false if there are no matching remote branches" do
+    @fido.clone("not-a-branch").should == false
   end
 
-  it "will mirror upstream if forced" do
+  it "goes nothing if .git dir exists" do
+    @fido.clone("master")
     sha = nil
-
-    cd TestRepo do
-      echo("foo") >> "FOO"
-      `git add FOO`
-      `git commit -m 'foo'`
+    cd "test-repo" do
+      echo("foo") > "FOO"
+      sh! "git add FOO"
+      sh! "git commit -m 'foo'"
       sha = lastSHA
     end
-
-    @fido.clone(TestRepo)
-
+    @fido.clone("master")
     cd "test-repo" do
-      echo("bar") >> "BAR"
-      `git add BAR`
+      sha.should == lastSHA
+    end
+  end
+
+  it "clone! forces mirror of origin/branch" do
+    @fido.clone("master")
+
+    sha = nil
+    cd "test-repo" do
+      sha = lastSHA
+      echo("foo") > "FOO"
+      `git add FOO`
       `git commit -m 'foo'`
     end
 
-    @fido.clone(TestRepo, true)
+    @fido.clone!("master")
 
     cd "test-repo" do
-      lastSHA.should == sha
+      sha.should == lastSHA
     end
   end
 
-  it "creates a wip backup of changes before destruction" do
-    @fido.clone(TestRepo)
-
-    cd "test-repo" do
-      echo("bar") >> "BAR"
-    end
-
-    @fido.clone(TestRepo, true)
-
-    cd "test-repo" do
-      Dir["BAR"].should.be.empty?
-      `git show fido-backup:BAR`.should == "bar\n"
-    end
-  end
 end
