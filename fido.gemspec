@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
 
   s.name = 'fido'
-  s.version = '0.1.2'
+  s.version = '0.2.0'
   s.date = '2009-10-30'
 
   s.description = "Fido - he fetches"
@@ -20,6 +20,8 @@ Gem::Specification.new do |s|
     spec/fido_spec.rb
   ]
   s.executables = ['fido']
+
+  s.add_dependency 'guns', '>= 0.1.3'
 
   s.extra_rdoc_files = %w[README.md]
 
