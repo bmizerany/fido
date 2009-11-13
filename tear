@@ -11,13 +11,13 @@ mkdir -p $TEAR_DIR/packages $TEAR_DIR/bin $TEAR_DIR/lib
 cd $TEAR_DIR/packages
 
 if test $# -lt 2; then
-	. fido
+	fido $1 master
 else
-	. fido
+	fido $@
 fi
 
 cd $TEAR_DIR
 
-for f in $FIDO_CLONED_TO_DIR/bin/* $FIDO_CLONED_TO_DIR/lib; do
-	echo $f
-done
+#for f in $FIDO_CLONED_TO_DIR/bin/* $FIDO_CLONED_TO_DIR/lib; do
+	#echo $f
+#done
