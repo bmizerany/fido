@@ -1,22 +1,26 @@
-#!/usr/bin/env sh
-set -e;
+#!/usr/bin/env ruby
+require 'fileutils'
 
-if test -z $TEARDIR; then
-	echo "You need to set TEARDIR"
-	echo "  be sure to add \$TEARDIR/bin to your \$PATH"
-	echo "  and \$TEARDIR/lib to your \$TEARDIR/lib to \$RUBYOPT"
-	exit 1
-fi
+include FileUtils
+include FileUtils::Verbose
 
-if test $# -lt 1; then
-	echo "Usage: tear dir"
-	exit 1
-fi
+if ENV["TEARDIR"].nil?
+		abort "You need to set $TEARDIR"
+end
 
-mkdir -p $TEARDIR $TEAR_DIR/bin $TEARDIR/lib
+if ARGV.size == 0
+		abort "Usage: #{$0} dir"
+end
 
-cd $TEARDIR
+TearDir = File.expand_path(ENV["TEARDIR"])
 
-for f in "$1/{bin,lib}/*"; do
-	ln -s $f
-done
+mkdir_p TearDir + "/bin"
+mkdir_p TearDir + "/lib"
+
+cd ARGV[0] do
+		Dir["{lib,bin}/*"].each do |file|
+				to = File.join(TearDir, file)
+				next if File.file?(to)
+				ln_s File.expand_path(file), to
+		end
+end
