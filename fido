@@ -42,7 +42,7 @@ git fetch origin
 
 branches=$(git branch -a)
 
-$FIDO_CLONED_TO_DIR=$GIT_WORK_TREE
+export $FIDO_CLONED_TO_DIR=$GIT_WORK_TREE
 
 while [ $# -gt 0 ]; do
 	attempt="remotes/origin/$1"
