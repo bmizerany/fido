@@ -1,0 +1,61 @@
+#!/usr/bin/env sh
+set -e
+
+GIT_VERSION=$(git --version | cut -d' ' -f3)
+
+if [ $GIT_VERSION \< '1.6.5' ]; then
+	echo "this version of $0 need git 1.6.5 or higher"
+	exit 1
+fi
+
+if [ $# -lt 2 ]; then
+	echo "Usage: $0 url trybranch1 [, trybranch2, ...]" >&2
+	exit 1
+fi
+
+url=$1 ; shift
+
+GIT_WORK_TREE=$(pwd)/$(basename `echo "$url" | awk -F':' '{print $NF}'` .git)
+GIT_DIR="$GIT_WORK_TREE/.git"
+
+if [ -f $GIT_DIR/FIDO ]; then
+	echo "already slobberd all over $GIT_DIR"
+	exit
+fi
+
+if ! [ -d $GIT_DIR ]; then
+	mkdir -p $GIT_DIR
+	cd $GIT_WORK_TREE
+	git init
+fi
+
+cd $GIT_WORK_TREE
+
+export GIT_WORK_TREE=$GIT_WORK_TREE
+export GIT_DIR=$GIT_DIR
+
+if ! git remote | grep -q origin; then
+	git remote add origin $url
+fi
+
+git fetch origin
+
+branches=$(git branch -a)
+
+$FIDO_CLONED_TO_DIR=$GIT_WORK_TREE
+
+while [ $# -gt 0 ]; do
+	attempt="remotes/origin/$1"
+	echo "attempting $attempt"
+	if echo $branches | grep -q "$attempt"; then
+		git reset --hard "$attempt"
+		git branch -M "$1"
+		touch "$GIT_DIR/FIDO"
+		echo "success"
+		exit
+	fi
+	shift
+done
+
+echo "no branch given was found"
+exit 1
