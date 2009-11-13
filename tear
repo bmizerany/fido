@@ -1,14 +1,21 @@
 #!/usr/bin/env sh
 set -e;
 
+if test -z $TEARDIR; then
+	echo "You need to set TEARDIR"
+	echo "  be sure to add \$TEARDIR/bin to your \$PATH"
+	echo "  and \$TEARDIR/lib to your \$TEARDIR/lib to \$RUBYOPT"
+	exit 1
+fi
+
 if test $# -lt 1; then
 	echo "Usage: tear dir"
 	exit 1
 fi
 
-mkdir -p $TEAR_DIR $TEAR_DIR/bin $TEAR_DIR/lib
+mkdir -p $TEARDIR $TEAR_DIR/bin $TEARDIR/lib
 
-cd $TEAR_DIR
+cd $TEARDIR
 
 for f in "$1/{bin,lib}/*"; do
 	ln -s $f
