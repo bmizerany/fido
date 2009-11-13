@@ -31,7 +31,6 @@ if ! [ -d $GIT_DIR ]; then
 	mkdir -p $GIT_DIR
 	cd $GIT_WORK_TREE
 	git init >&2
-	echo test
 fi
 
 cd $GIT_WORK_TREE
