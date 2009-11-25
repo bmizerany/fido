@@ -1,9 +1,5 @@
 #!/bin/sh
-set -e
-
-function tildize() {
-	echo $(echo $1 | sed "s|$HOME|~|")
-}
+. $(dirname $0)/tear-common
 
 tear_dir=~/.tear
 profile=~/.profile
@@ -13,18 +9,13 @@ Create a directory structure for tear in $tear_dir or
 the <dir> given to --base-dir
 
   -d, --base-dir <dir>  override default tear directory 
-                        (default is $(tildize $tear_dir))
+                        (default is $(tildify $tear_dir))
 
   -p, --profile  <dir>  override default profile script
-                        (default is $(tildize $profile))
+                        (default is $(tildify $profile))
 
   -h, --help            show this message"
 
-function see_usage() {
-	test -n "$1" && echo "!! $1" >&2 && echo >&2
-	echo "Usage: $0 $USAGE" >&2
-	exit 1
-}
 
 while [ $# -gt 0 ]; do
 	case "$1" in
@@ -51,10 +42,9 @@ mkdir -p $tear_dir/lib
 
 TEARCONFIG="
 ## TEAR setup
-TEARDIR=$TEARDIR
-PATH=\$TEARDIR:\$PATH
-RUBYLIB=\$TEARDIR/lib:\$RUBYLIB
-export TEARDIR PATH RUBYLIB
+setenv TEARDIR=$TEARDIR
+setenv PATH=\$TEARDIR:\$PATH
+setenv RUBYLIB=\$TEARDIR/lib:\$RUBYLIB
 ## end TEAR setup"
 
 ## Write the tear config to the profile if it's not there
