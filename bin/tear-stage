@@ -1,0 +1,8 @@
+#!/bin/sh
+# USAGE
+# <package-dir> <env>
+# Stages <package-dir> in <env>
+
+. $(dirname $0)/tear-common
+
+

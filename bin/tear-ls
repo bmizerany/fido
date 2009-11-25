@@ -1,0 +1,47 @@
+#!/bin/sh
+# USAGE
+# [-e <name>] <package>
+# Lists symlinked files and directories for <package>
+# in and environment
+#
+#   -e, --env <name>      environment to work on (default is `tear env`)
+#   -h, --help            show this message
+
+. $(dirname $0)/tear-common
+
+env=$(_env)
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-e|--env)
+			test $# -lt 2 && see_usage "missing argument for $1"
+			env=$2
+			shift; shift
+			;;
+		-h|--help)
+			see_usage
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+test $# -eq 0 && see_usage
+
+pkg=$1
+staged=$(staged_pkg_dir $pkg)
+if test -L $staged; then
+	realdir=$(readlink -n $staged)
+	if test -d $realdir; then
+		for dir in "bin lib"; do
+			test ! -d $realdir/$dir && continue
+			for file in $staged/$dir/*; do
+				echo $file
+			done
+		done
+	else
+		die "link $(staged) is broken"
+	fi
+else
+	die "package not found: $pkg"
+fi
