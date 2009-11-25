@@ -63,4 +63,14 @@ function _env() {
 	fi
 }
 
+staged_pkg_dir() {
+	pkg=$1
+	env=$2
+	echo "$tear_dir/$env/staged/$pkg"
+}
+
+env_dir() {
+	$tear_dir/env/$1
+}
+
 # vim: syn=sh

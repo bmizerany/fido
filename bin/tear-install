@@ -47,6 +47,4 @@ fi
 mv $pkg $pkgdir
 
 #tear uninstall $pkg
-tear stage $pkgdir $env
-
-rm -rf $tmpdir
+tear stage $pkgdir $env; rm -rf $tmpdir
