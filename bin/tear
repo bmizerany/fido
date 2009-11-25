@@ -8,16 +8,36 @@ function commands() {
 	for cmd in $(ls $base_dir/tear-*); do
 		if test -x $cmd; then
 			desc=$(grep '#desc:' $cmd | sed 's|#desc: ||')
-			echo "$(basename $cmd | sed 's|tear-||')\t- $desc"
+			echo "  $(basename $cmd | sed 's|tear-||')\t- $desc"
 		fi
 	done
 }
 
-USAGE="command args
+USAGE="[-d <dir>] command args
+Options:
+
+  -d, --tear-dir <dir>\t- override \$TEARDIR
 
 Available commands:
 
 $(commands)"
+
+args=""
+while [ $# -gt 0 ]; do
+case "$1" in
+	-d|--tear-dir)
+		test $# -lt 2 &&
+			see_usage "missing argument for $1"
+		TEARDIR=$1
+		;;
+	-*|--*)
+		see_usage "unknown option $1"
+		;;
+	*)
+		args="$args $1"; shift
+		;;
+esac
+done
 
 if test $# -gt 0; then
 	command="$base_dir/tear-$1"; shift
