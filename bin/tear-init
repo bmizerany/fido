@@ -37,9 +37,9 @@ ln -s $tear_dir/env/default $active_dir
 
 TEARCONFIG="
 ## TEAR setup
-setenv TEARDIR=$tear_dir
-setenv PATH=\$TEARDIR/active/bin:\$PATH
-setenv RUBYLIB=\$TEARDIR/active/lib:\$RUBYLIB
+export TEARDIR=$tear_dir
+export PATH=\$TEARDIR/active/bin:\$PATH
+export RUBYLIB=\$TEARDIR/active/lib:\$RUBYLIB
 ## end TEAR setup"
 
 ## Write the tear config to the profile if it's not there
@@ -52,5 +52,3 @@ fi
 ## Send source sh script to stdout
 echo "You'll need to source your $profile" >&2
 echo ". $(echo $profile | sed "s|$HOME|~|")"
-
-exit

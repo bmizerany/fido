@@ -20,22 +20,29 @@ function commands() {
 	done
 }
 
-USAGE2=$(commands)
+##
+# This prevents the the need to load commands
+# unneccessarly and slow done every execution
+#
+USAGE2=
+function _see_usage() {
+	USAGE2=$(commands)
+	see_usage $@
+}
 
-args=""
 while [ $# -gt 0 ]; do
 case "$1" in
 	-d|--tear-dir)
 		test $# -lt 2 &&
-			see_usage "missing argument for $1"
+			_see_usage "missing argument for $1"
 		export TEARDIR=$2
 		shift; shift
 		;;
 	-h|--help)
-		see_usage
+		_see_usage
 		;;
 	-*)
-		see_usage "unknown option $1"
+		_see_usage "unknown option $1"
 		;;
 	*)
 		break
@@ -53,5 +60,5 @@ if test $# -gt 0; then
 	fi
 	$command $@
 else
-	see_usage
+	_see_usage
 fi
