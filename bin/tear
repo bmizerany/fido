@@ -14,7 +14,8 @@
 function commands() {
 	for cmd in $(ls $base_dir/tear-*); do
 		if test -x $cmd; then
-			echo "  $(cmdify $cmd)\t- $(desc $cmd)"
+			echo "$(cmdify $cmd)\t$(desc $cmd)" |
+				awk -F"\t" '{ printf "%-12s - %s\n", $1, $2; }'
 		fi
 	done
 }
