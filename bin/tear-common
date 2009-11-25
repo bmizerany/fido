@@ -7,15 +7,15 @@ tear_dir=${TEARDIR:="~/.tear"}
 active_dir=$tear_dir/active
 
 function warn() {
-	echo "$1" >&2
+	echo "$@" >&2
 }
 
 function fatal() {
-	warn "fatal: $1"
+	warn "tear: fatal: $@"
 }
 
 function die() {
-	fatal $1
+	fatal $@
 	exit 1
 }
 

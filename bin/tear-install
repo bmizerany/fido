@@ -1,16 +1,14 @@
 #!/bin/sh
 # USAGE
-# <repo> [version[,version[...]]
+# <repo> [version version ...]
 # Installs a package into an environment
 #
-#   -e, --env <name>      override default profile script
-#                         (default is `tear env`)
-#
+#   -e, --env <name>      environment to work on (default is `tear env`)
 #   -h, --help            show this message
 # 
 # Arguments:
 #
-#   version               this can be a git branch or tag
+#   version               this can be a git branch or tag (default is master)
 
 . $(dirname $0)/tear-common
 
@@ -38,7 +36,7 @@ head=$(fido $@ master)
 
 ## Move the package to its env dir
 pkg=$(basename $1 .git)
-envdir=$tear_dir/env/$env
+envdir=$tear_dir/env/packages/$env
 pkgdir=$envdir/$pkg-$head
 if test -d $pkgdir; then
 	die "collision; $pkg-$head is already installed in $env"
@@ -48,7 +46,7 @@ fi
 
 mv $pkg $pkgdir
 
-tear uninstall $pkg
-tear ln $pkgdir $env
+#tear uninstall $pkg
+tear stage $pkgdir $env
 
 rm -rf $tmpdir
