@@ -30,14 +30,16 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-mkdir -p $tear_dir/bin
-mkdir -p $tear_dir/lib
+mkdir -p $tear_dir/env/default/bin
+mkdir -p $tear_dir/env/default/lib
+rm $active_dir
+ln -s $tear_dir/env/default $active_dir
 
 TEARCONFIG="
 ## TEAR setup
-setenv TEARDIR=$TEARDIR
-setenv PATH=\$TEARDIR:\$PATH
-setenv RUBYLIB=\$TEARDIR/lib:\$RUBYLIB
+setenv TEARDIR=$tear_dir
+setenv PATH=\$TEARDIR/active/bin:\$PATH
+setenv RUBYLIB=\$TEARDIR/active/lib:\$RUBYLIB
 ## end TEAR setup"
 
 ## Write the tear config to the profile if it's not there

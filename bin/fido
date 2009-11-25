@@ -1,21 +1,20 @@
 #!/usr/bin/env sh
-set -e
+# USAGE
+# 
 
-function warn() {
-	echo $1 >&2
-}
-
-GIT_VERSION=$(git --version | cut -d' ' -f3)
-
-if [ $GIT_VERSION \< '1.6.5' ]; then
-	warn "this version of $0 need git 1.6.5 or higher"
-	exit 1
-fi
+. $(dirname $0)/tear-common
 
 if [ $# -lt 2 ]; then
-	warn "Usage: $0 url trybranch1 [, trybranch2, ...]"
-	exit 1
+	see_usage "fido needs at least 1 try-branch"
 fi
+
+function _git() {
+	git $@ >&2
+}
+
+function warn() {
+	echo $@ >&2
+}
 
 url=$1 ; shift
 
@@ -23,14 +22,13 @@ GIT_WORK_TREE=$(pwd)/$(basename `echo "$url" | awk -F':' '{print $NF}'` .git)
 GIT_DIR="$GIT_WORK_TREE/.git"
 
 if [ -f $GIT_DIR/FIDO ]; then
-	warn "already slobberd all over $GIT_DIR"
-	exit
+	die "already slobberd all over $GIT_DIR"
 fi
 
 if ! [ -d $GIT_DIR ]; then
 	mkdir -p $GIT_DIR
 	cd $GIT_WORK_TREE
-	git init >&2
+	_git init
 fi
 
 cd $GIT_WORK_TREE
@@ -39,10 +37,10 @@ export GIT_WORK_TREE=$GIT_WORK_TREE
 export GIT_DIR=$GIT_DIR
 
 if ! git remote | grep -q origin; then
-	git remote add origin $url
+	_git remote add origin $url
 fi
 
-git fetch origin
+_git fetch origin 
 
 branches=$(git branch -a)
 
@@ -50,15 +48,14 @@ while [ $# -gt 0 ]; do
 	attempt="remotes/origin/$1"
 	warn "attempting $attempt"
 	if echo $branches | grep -q "$attempt"; then
-		git reset --hard "$attempt" >&2
-		git branch -M "$1" >&2
+		_git reset --hard "$attempt"
+		_git branch -M "$1"
 		touch "$GIT_DIR/FIDO"
 		warn "success"
-		echo $GIT_WORK_TREE
+		git rev-parse HEAD
 		exit
 	fi
 	shift
 done
 
-warn "no branch given was found"
-exit 1
+die "no branch given was found"

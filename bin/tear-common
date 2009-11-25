@@ -4,9 +4,10 @@ set -e
 base_name=$(basename $0 | sed 's|-| |')
 base_dir=$(dirname $0)
 tear_dir=${TEARDIR:="~/.tear"}
+active_dir=$tear_dir/active
 
 function die() {
-	echo "$1" >&2
+	echo "fatal: $1" >&2
 	exit 1
 }
 
@@ -39,6 +40,19 @@ function usage() {
 
 function desc() {
 	usage $1 | head -n2 | tail -n1
+}
+
+function mkcd() {
+	mkdir -p $1
+	cd $1
+}
+
+function env() {
+	if test -L $tear_dir/active; then
+		echo $(readlink $tear_dir/active) | awk -F/ '{ print $NF }'
+	else
+		die "$tear_dir/active doesn't exist. run see \`tear help init\`"
+	fi
 }
 
 # vim: syn=sh
