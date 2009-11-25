@@ -17,8 +17,8 @@ function tildify() {
 }
 
 function see_usage() {
-	test -n "$1" && echo "!! $1" >&2 && echo >&2
-	echo "Usage: $0 $(usage $0)" >&2
+	[ -n "$1" ] && echo "!! $1" >&2 && echo >&2
+	echo "$(usage $0)" >&2
 	exit 1
 }
 
@@ -31,8 +31,8 @@ function usage() {
 		/^#\s*$/   { {if(inusage=1) print ""} }
 	'
 	raw=$(awk "$prog" $1)
-	echo "$raw"
-	test -n "$USAGE2" && echo && echo "$USAGE2"
+	echo "Usage: $0 $raw"
+	[ -n "$USAGE2" ] && echo && echo "$USAGE2"
 }
 
 function desc() {

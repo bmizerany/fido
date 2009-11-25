@@ -2,6 +2,7 @@
 
 # USAGE
 # [-p <dir>][-d <dir>]
+#
 # Create a directory structure for tear
 #
 #   -d, --base-dir <dir>  override default tear directory 
@@ -10,7 +11,7 @@
 #   -p, --profile  <dir>  override default profile script
 #                         (default is $(tildify $profile))
 #
-#   -h, --help            show this message"
+#   -h, --help            show this message
 
 . $(dirname $0)/tear-common
 
@@ -48,8 +49,9 @@ setenv RUBYLIB=\$TEARDIR/lib:\$RUBYLIB
 ## end TEAR setup"
 
 ## Write the tear config to the profile if it's not there
-touch $profile
-if ! grep -q "## TEAR setup" $profile; then
+if ! test -f $profile; then
+	see_usage "$profile doesn't exist; please create or specifiy another with -p"
+elif ! grep -q "## TEAR setup" $profile; then
 	echo "$TEARCONFIG" >> $profile
 fi
 
