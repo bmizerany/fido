@@ -1,6 +1,6 @@
 #!/bin/sh
 # USAGE
-# [-d <dir>] command args
+# [-d <dir>] <command> [args]
 # An executable and library manager
 #
 #   -d, --tear-dir <dir>    - override $TEARDIR
