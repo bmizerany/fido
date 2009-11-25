@@ -1,0 +1,63 @@
+#!/bin/sh
+set -e
+
+tear_dir=$HOME/.tear
+profile=~/.profile
+
+USAGE="[-p <DIR>][-d <DIR>]
+Create a directory structure for tear in $tear_dir or
+the <dir> given to --base-dir
+
+  -d, --base-dir  override default tear directory (default is $tear_dir)
+  -p, --profile   override default profile script for setting ENV variables
+                  (default is $profile)
+
+  -h, --help      show this message"
+
+function see_usage() {
+	echo "Usage: $0 $USAGE" >&2
+	exit 1
+}
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-d|--base-dir)
+			test $# -lt 2 && missing_argument $1
+			tear_dir=$2
+			shift; shift
+			;;
+		-p|--profile)
+			test $# -lt 2 && missing_argument $1
+			profile=$2
+			shift; shift
+			;;
+		-h|--help)
+			see_usage
+			;;
+		*)
+			echo "invalid argument $1" >&2
+			see_usage
+	esac
+	shift
+done
+
+mkdir -p $TEARDIR
+
+TEARCONFIG="
+## TEAR setup
+TEARDIR=$TEARDIR
+PATH=\$TEARDIR:\$PATH
+RUBYLIB=\$TEARDIR/lib:\$RUBYLIB
+export TEARDIR PATH RUBYLIB
+## end TEAR setup
+"
+
+## Write the tear config to the profile if it's not there
+if ! grep -q "## TEAR setup" $profile; then
+	echo -n "$TEARCONFIG" >> $profile
+fi
+
+## Send source sh script to stdout
+echo ". $(echo $profile | sed "s|$HOME|~|")"
+
+exit

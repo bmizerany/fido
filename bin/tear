@@ -1,26 +1,52 @@
-#!/usr/bin/env ruby
-require 'fileutils'
+#!/bin/sh
 
-include FileUtils
-include FileUtils::Verbose
+USAGE="
+Usage: $0 [-p <DIR>][-i <DIR>] [DIR]
+	install
 
-if ENV["TEARDIR"].nil?
-		abort "You need to set $TEARDIR"
-end
+inst=
+totear=
+profile=~/.profile
+while test $# -gt 0; do
+case "$1" in
+	-i|--install)
+		if test $# -lt 2; then
+			TEARDIR=~/.tear
+			mkdir -p $TEARDIR
+		else
+			TEARDIR="$2"
+			shift
+		fi
+		export TEARDIR
+		shift
+		inst=1
+		;;
+	-p|--profile)
+		if test $# -lt 2; then
+			echo "missing value of $1 argument" >2
+			exit 1
+		fi
+		profile=$2
+		shift; shift
+		;;
+	*)
+		totear=$1
+		break
+esac
 
-if ARGV.size == 0
-		abort "Usage: #{$0} dir"
-end
+if test -n "$inst"; then
+	mkdir -p $TEARDIR
+	TEARCONFIG="
+## TEAR setup
+TEARDIR=$TEARDIR
+PATH=\$TEARDIR:\$PATH
+RUBYLIB=\$TEARDIR/lib:\$RUBYLIB
+export TEARDIR PATH RUBYLIB
+## end TEAR setup
+"
+	echo $TEARCONFIG > $profile
+	echo ". $profile"
+	exit
+fi
 
-TearDir = File.expand_path(ENV["TEARDIR"])
 
-mkdir_p TearDir + "/bin"
-mkdir_p TearDir + "/lib"
-
-cd ARGV[0] do
-		Dir["{lib,bin}/*"].each do |file|
-				to = File.join(TearDir, file)
-				next if File.file?(to)
-				ln_s File.expand_path(file), to
-		end
-end
