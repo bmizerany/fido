@@ -1,3 +1,33 @@
 #!/bin/sh
 
+base_dir=$(dirname $0)
+
 . $(dirname $0)/tear-common
+
+function commands() {
+	for cmd in $(ls $base_dir/tear-*); do
+		if test -x $cmd; then
+			desc=$(grep '#desc:' $cmd | sed 's|#desc: ||')
+			echo "$(basename $cmd | sed 's|tear-||')\t- $desc"
+		fi
+	done
+}
+
+USAGE="command args
+
+Available commands:
+
+$(commands)"
+
+if test $# -gt 0; then
+	command="$base_dir/tear-$1"; shift
+
+	if ! test -f $command; then
+		die "tear can't find $command"
+	elif ! test -x $command; then
+		die "$command is not executable"
+	fi
+	$command $@
+else
+	see_usage
+fi

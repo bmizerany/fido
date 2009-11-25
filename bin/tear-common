@@ -1,6 +1,11 @@
 #!/bin/sh
 set -e
 
+function die() {
+	echo "$1" >&2
+	exit 1
+}
+
 function tildify() {
 	echo $(echo $1 | sed "s|$HOME|~|")
 }

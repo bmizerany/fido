@@ -1,4 +1,5 @@
 #!/bin/sh
+#desc: setup tear
 . $(dirname $0)/tear-common
 
 tear_dir=~/.tear
