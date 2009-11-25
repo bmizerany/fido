@@ -1,0 +1,14 @@
+#!/bin/sh
+# USAGE
+# command
+#   Get detailed help for a tear command
+
+. $(dirname $0)/tear-common
+
+test $# -eq 0 && see_usage
+
+cmd="tear-$1"
+if which $1; then
+	die "unknown command $1"
+fi
+usage $(which $cmd) >&2
