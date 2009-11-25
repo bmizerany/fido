@@ -2,6 +2,7 @@
 set -e
 
 base_dir=$(dirname $0)
+tear_dir=${TEARDIR:="~/.tear"}
 
 function die() {
 	echo "$1" >&2
@@ -31,7 +32,7 @@ function usage() {
 		/^#\s*$/   { {if(inusage=1) print ""} }
 	'
 	raw=$(awk "$prog" $1)
-	echo "Usage: $0 $raw"
+	echo "Usage: $1 $raw"
 	[ -n "$USAGE2" ] && echo && echo "$USAGE2"
 }
 

@@ -1,30 +1,22 @@
 #!/bin/sh
-
 # USAGE
 # [-p <dir>][-d <dir>]
-#
 # Create a directory structure for tear
 #
-#   -d, --base-dir <dir>  override default tear directory 
-#                         (default is $(tildify $tear_dir))
-#
 #   -p, --profile  <dir>  override default profile script
-#                         (default is $(tildify $profile))
+#                         (default is ~/.profile)
 #
 #   -h, --help            show this message
+#
+# NOTE:  You can use the --tear-dir option after `tear` to
+#        specify where $TEARDIR should be installed
 
 . $(dirname $0)/tear-common
 
-tear_dir=~/.tear
 profile=~/.profile
 
 while [ $# -gt 0 ]; do
 	case "$1" in
-		-d|--base-dir)
-			test $# -lt 2 && see_usage "missing argument for $1"
-			tear_dir=$2
-			shift; shift
-			;;
 		-p|--profile)
 			test $# -lt 2 && see_usage "missing argument for $1"
 			profile=$2
