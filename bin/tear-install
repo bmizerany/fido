@@ -1,0 +1,33 @@
+#!/bin/sh
+# USAGE
+# <repo> [version[,version[...]]
+# Installs a package into an environment
+#
+#   -e, --env <name>      override default profile script
+#                         (default is `tear env`)
+#
+#   -h, --help            show this message
+# 
+# Arguments:
+#
+#   version               this can be a git branch or tag
+
+. $(dirname $0)/tear-common
+
+exit
+
+env=
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-e|--env)
+			test $# -lt 2 && see_usage "missing argument for $1"
+			env=$2
+			shift; shift
+			;;
+		-h|--help)
+			see_usage
+			;;
+		*)
+			see_usage "invalid argument $1"
+	esac
+done
