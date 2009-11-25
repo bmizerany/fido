@@ -1,0 +1,54 @@
+#!/bin/sh
+# USAGE
+# <package>
+# Installs a package into an environment
+#
+#   -e, --env <name>      override default profile script
+#                         (default is `tear env`)
+#
+#   -h, --help            show this message
+# 
+# Arguments:
+#
+#   version               this can be a git branch or tag
+
+. $(dirname $0)/tear-common
+
+env="default"
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-e|--env)
+			test $# -lt 2 && see_usage "missing argument for $1"
+			env=$2
+			shift; shift
+			;;
+		-h|--help)
+			see_usage
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+tmpdir=$tear_dir/tmp/tmp.$RANDOM
+mkcd $tmpdir
+
+head=$(fido $@ master)
+
+## Move the package to its env dir
+pkg=$(basename $1 .git)
+envdir=$tear_dir/env/$env
+pkgdir=$envdir/$pkg-$head
+if test -d $pkgdir; then
+	die "collision; $pkg-$head is already installed in $env"
+elif ! test -d $envdir; then
+	die "environment $env doesn't exist; see \`tear help env\`"
+fi
+
+mv $pkg $pkgdir
+
+tear uninstall $pkg
+tear ln $pkgdir $env
+
+rm -rf $tmpdir

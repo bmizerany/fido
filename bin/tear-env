@@ -1,0 +1,8 @@
+#!/bin/sh
+# USAGE
+#
+# Prints the active environment
+
+. $(dirname $0)/tear-common
+
+env
