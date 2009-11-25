@@ -31,7 +31,7 @@ case "$1" in
 		export TEARDIR=$2
 		shift; shift
 		;;
-	-*|--*)
+	-*)
 		see_usage "unknown option $1"
 		;;
 	*)
