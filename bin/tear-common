@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+function tildify() {
+	echo $(echo $1 | sed "s|$HOME|~|")
+}
+
+function see_usage() {
+	test -n "$1" && echo "!! $1" >&2 && echo >&2
+	echo "Usage: $0 $USAGE" >&2
+	exit 1
+}
+
+# vim: syn=sh
