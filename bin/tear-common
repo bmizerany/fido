@@ -6,8 +6,16 @@ base_dir=$(dirname $0)
 tear_dir=${TEARDIR:="~/.tear"}
 active_dir=$tear_dir/active
 
+function warn() {
+	echo "$1" >&2
+}
+
+function fatal() {
+	warn "fatal: $1"
+}
+
 function die() {
-	echo "fatal: $1" >&2
+	fatal $1
 	exit 1
 }
 
@@ -20,8 +28,8 @@ function tildify() {
 }
 
 function see_usage() {
-	[ -n "$1" ] && echo "!! $1" >&2 && echo >&2
-	echo "$(usage $0)" >&2
+	[ -n "$1" ] && fatal "$1" && warn
+	warn "$(usage $0)"
 	exit 1
 }
 
@@ -47,7 +55,7 @@ function mkcd() {
 	cd $1
 }
 
-function env() {
+function _env() {
 	if test -L $tear_dir/active; then
 		echo $(readlink $tear_dir/active) | awk -F/ '{ print $NF }'
 	else

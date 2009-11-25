@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 # USAGE
-# 
+# url [trybranch1][trybranch2][...]
+# git-clone with branch failover
 
 . $(dirname $0)/tear-common
 

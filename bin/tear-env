@@ -5,4 +5,4 @@
 
 . $(dirname $0)/tear-common
 
-env
+_env
