@@ -1,26 +1,25 @@
 #!/bin/sh
-
-base_dir=$(dirname $0)
+# USAGE
+# [-d <dir>] command args
+# An executable and library manager
+#
+#   -d, --tear-dir <dir>    - override $TEARDIR
+#
+# Available commands:
+# (NOTE: Use `help <command>` for detailed info)
+#
 
 . $(dirname $0)/tear-common
 
 function commands() {
 	for cmd in $(ls $base_dir/tear-*); do
 		if test -x $cmd; then
-			desc=$(grep '#desc:' $cmd | sed 's|#desc: ||')
-			echo "  $(basename $cmd | sed 's|tear-||')\t- $desc"
+			echo "$(cmdify $cmd)\t- $(desc $cmd)"
 		fi
 	done
 }
 
-USAGE="[-d <dir>] command args
-Options:
-
-  -d, --tear-dir <dir>\t- override \$TEARDIR
-
-Available commands:
-
-$(commands)"
+USAGE2=$(commands)
 
 args=""
 while [ $# -gt 0 ]; do
@@ -30,6 +29,9 @@ case "$1" in
 			see_usage "missing argument for $1"
 		export TEARDIR=$2
 		shift; shift
+		;;
+	-h|--help)
+		see_usage
 		;;
 	-*)
 		see_usage "unknown option $1"

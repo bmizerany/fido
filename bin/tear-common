@@ -1,9 +1,15 @@
 #!/bin/sh
 set -e
 
+base_dir=$(dirname $0)
+
 function die() {
 	echo "$1" >&2
 	exit 1
+}
+
+function cmdify() {
+	echo "$(basename $cmd | sed 's|tear-||')"
 }
 
 function tildify() {
@@ -12,8 +18,25 @@ function tildify() {
 
 function see_usage() {
 	test -n "$1" && echo "!! $1" >&2 && echo >&2
-	echo "Usage: $0 $USAGE" >&2
+	echo "Usage: $0 $(usage $0)" >&2
 	exit 1
+}
+
+function usage() {
+	prog='
+		BEGIN { inusage=0 }
+		/^# USAGE/ { inusage=1; next }
+		/^[^#]/    { {if(inusage=1) exit;} }
+		/^# (.*)/  { {if(inusage=1) print substr($0, 3)} }
+		/^#\s*$/   { {if(inusage=1) print ""} }
+	'
+	raw=$(awk "$prog" $1)
+	echo "$raw"
+	test -n "$USAGE2" && echo && echo "$USAGE2"
+}
+
+function desc() {
+	usage $1 | head -n2 | tail -n1
 }
 
 # vim: syn=sh
