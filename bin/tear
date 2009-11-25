@@ -28,13 +28,14 @@ case "$1" in
 	-d|--tear-dir)
 		test $# -lt 2 &&
 			see_usage "missing argument for $1"
-		TEARDIR=$1
+		export TEARDIR=$2
+		shift; shift
 		;;
 	-*|--*)
 		see_usage "unknown option $1"
 		;;
 	*)
-		args="$args $1"; shift
+		break
 		;;
 esac
 done
