@@ -5,4 +5,10 @@
 
 . $(dirname $0)/tear-common
 
-_env
+if test $# -eq 0; then
+	_env
+else
+	cmd=$1
+	shift
+	tear-env-$cmd $@
+fi

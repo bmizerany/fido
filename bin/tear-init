@@ -30,7 +30,7 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-tear-env-create --use default
+tear-env-create default
 
 TEARCONFIG="
 ## TEAR setup
