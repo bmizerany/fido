@@ -35,6 +35,8 @@ if ! tear-env-exists $env; then
 	die "environment $env doesn't exist; see \`tear help env\`"
 fi
 
+pkg=$(basename $1 .git)
+
 ###
 # Create a random temp directory for the clone
 tmpdir=$tear_dir/tmp/tmp.$RANDOM
@@ -48,13 +50,12 @@ mkcd $tmpdir
 # Clone with fido and get HEAD from output
 head=$(fido $@ master)
 
-pkg=$(basename $1 .git)
-pkgname="$pkg-$head"
-
 ###
 # Install the package to it's respective package directory
-mv $pkg $tear_dir/env/$env/packages/$pkgname
+pkgdir=$tear_dir/env/$env/packages/$pkg-$head
+[ -d $pkgdir ] && die "$pkg-$head already installed in $env"
+mv $pkg $pkgdir
 
 ###
 # Finally, stage it for use
-tear stage $env $pkgname; rm -rf $tmpdir
+tear stage $env $pkg $head; rm -rf $tmpdir
