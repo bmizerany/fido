@@ -46,5 +46,10 @@ fi
 
 mv $pkg $pkgdir
 
+# track with symlink
+staged=$(staged_pkg_dir $pkg)
+rm -f staged
+ln -s
+
 #tear uninstall $pkg
 tear stage $pkgdir $env; rm -rf $tmpdir

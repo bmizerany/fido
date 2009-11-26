@@ -1,0 +1,30 @@
+#!/bin/sh
+# USAGE
+# <env>
+# returns non-zero if <env> exists
+#
+#   -h, --help            show this message
+# 
+# Arguments:
+#
+#   <env>    the name of the environment to find
+
+. $(dirname $0)/tear-common
+
+while [ $# -gt 0 ]; do
+case "$1" in
+	-h|--help)
+		see_usage
+		;;
+	-*)
+		see_usage "unknown option $1"
+		;;
+	*)
+		break
+		;;
+esac
+done
+
+[ $# -eq 0 ] && see_usage "missing env argument"
+
+test -d $tear_dir/env/$1

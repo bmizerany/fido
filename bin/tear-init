@@ -30,10 +30,7 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-mkdir -p $tear_dir/env/default/bin
-mkdir -p $tear_dir/env/default/lib
-rm $active_dir
-ln -s $tear_dir/env/default $active_dir
+tear-env-create --use default
 
 TEARCONFIG="
 ## TEAR setup

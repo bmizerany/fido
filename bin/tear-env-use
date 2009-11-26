@@ -1,0 +1,36 @@
+#!/bin/sh
+# USAGE
+# <env>
+# Make <env> the active system environment
+#
+#   -h, --help            show this message
+# 
+# Arguments:
+#
+#   <env>    the name of the environment to use
+
+. $(dirname $0)/tear-common
+
+while [ $# -gt 0 ]; do
+case "$1" in
+	-h|--help)
+		see_usage
+		;;
+	-*)
+		see_usage "unknown option $1"
+		;;
+	*)
+		break
+		;;
+esac
+done
+
+[ $# -eq 0 ] && see_usage "missing env argument"
+
+env=$1
+if tear-env-exists $env; then
+	rm -f $tear_dir/active
+	ln -s $tear_dir/env/$env/staged $tear_dir/active
+else
+	die "$env doesn't exist.  see \`tear help env-create\`"
+fi

@@ -57,7 +57,7 @@ function mkcd() {
 
 function _env() {
 	if test -L $tear_dir/active; then
-		echo $(readlink $tear_dir/active) | awk -F/ '{ print $NF }'
+		echo $(readlink $tear_dir/active) | awk -F/ '{ print $(NF - 1) }'
 	else
 		die "$tear_dir/active doesn't exist. run see \`tear help init\`"
 	fi
