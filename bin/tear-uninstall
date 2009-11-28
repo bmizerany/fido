@@ -1,14 +1,12 @@
 #!/bin/sh
 # USAGE
-# <package>
-# Installs a package into an environment
+# [-e <env>] <pacakge>
+# Uninstall a package from and environment
 #
-#   -e, --env <name>      environment to work on (default is `tear env`)
+#   -e, --env <name>      override default profile script
+#                         (default is `tear env`)
+#
 #   -h, --help            show this message
-#
-# Arguments
-#
-#   <package>   is a git-url
 
 . $(dirname $0)/tear-common
 
@@ -29,21 +27,7 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-test $# -eq 0 && see_usage
+[ $# -eq 0 ] && die "missing <package> argument"
 
 pkg=$1
-activedir="$tear_dir/$env/staged/$pkg"
-
-if test -L $activedir; then 
-	targetdir=$(readlink -n $activedir)
-	test ! -L $targetdir && die "$targetdir is not a directory"
-
-	for dir in "bin lib"; do
-		for file in $(ls $targetdir/$dir); do
-			rm -f "$activedir/$dir/$file"
-			warn "successfully uninstalled $pkg from $env"
-		done
-	done
-else
-	die "unable to find package $pkg in $env"
-fi
+rm -rf $tear_dir/env/$env/packages/$pkg
