@@ -36,7 +36,7 @@ done
 env=$1
 
 mkcd  $tear_dir/env/$env
-mkdir packages staged staged/bin staged/lib
+mkdir -p packages staged staged/bin staged/lib
 
 [ -z "$nouse" ] && tear-env-use $env
 

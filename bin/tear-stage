@@ -1,7 +1,7 @@
 #!/bin/sh
 # USAGE
-# <env> <package> <version>
-# Stages <package-long> in <env>
+# <env> <package>
+# Stages <package> in <env>
 #
 #   -h, --help            show this message
 
@@ -21,20 +21,29 @@ case "$1" in
 esac
 done
 
-[ $# -lt 3 ] && see_usage "missing arguments"
+[ $# -lt 2 ] && see_usage "missing arguments"
 
 env=$1
 pkg=$2
-ver=$3
+
+if ! tear-env-exists $env; then
+	die "unknown env $env; see \`tear help env-create\`"
+fi
 
 ###
 # Perform all work in env
 cd $tear_dir/env/$env
 
-if ! test -L packages/$pkg-$ver; then
-	warn "Staging $pkg-$ver $env"
-	rm -f active/$pkg
-	ln -s packages/$pkg-$ver active/$pkg
-else
-	die "unknown package $pkg-$ver"
-fi
+[ ! -d packages/$pkg ] && die "package $pkg not found in $env"
+
+warn "Staging $pkg in $env"
+
+[ -L staged/$pkg ] && rm -f staged/$pkg
+
+for dir in $(echo bin; echo lib); do
+	xdir=$(pwd)/packages/$pkg/$dir
+	[ ! -d $xdir ] && continue
+	for file in $(cd $xdir && ls); do
+		(cd staged/$dir && ln -sf $xdir/$file)
+	done
+done

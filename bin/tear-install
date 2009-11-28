@@ -1,8 +1,9 @@
 #!/bin/sh
 # USAGE
-# <repo> [version version ...]
+# [-efh] <repo> [version version ...]
 # Installs a package into an environment
 #
+#   -e, --env <name>      environment to work on (default is `tear env`)
 #   -e, --env <name>      environment to work on (default is `tear env`)
 #   -h, --help            show this message
 # 
@@ -13,12 +14,17 @@
 . $(dirname $0)/tear-common
 
 env=$(_env)
+force=
 while [ $# -gt 0 ]; do
 	case "$1" in
 		-e|--env)
 			test $# -lt 2 && see_usage "missing argument for $1"
 			env=$2
 			shift; shift
+			;;
+		-f|--force)
+			force=1
+			shift
 			;;
 		-h|--help)
 			see_usage
@@ -48,14 +54,15 @@ mkcd $tmpdir
 
 ###
 # Clone with fido and get HEAD from output
-head=$(fido $@ master)
+fido $@ master
 
 ###
 # Install the package to it's respective package directory
-pkgdir=$tear_dir/env/$env/packages/$pkg-$head
-[ -d $pkgdir ] && die "$pkg-$head already installed in $env"
+pkgdir=$tear_dir/env/$env/packages/$pkg
+[ -d $pkgdir -a -z "$force" ] && die "$pkg already installed in $env; use -f to override"
+rm -rf $pkgdir
 mv $pkg $pkgdir
 
 ###
 # Finally, stage it for use
-tear stage $env $pkg $head; rm -rf $tmpdir
+tear-stage $env $pkg; rm -rf $tmpdir
