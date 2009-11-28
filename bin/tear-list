@@ -1,22 +1,16 @@
 #!/bin/sh
 # USAGE
-# [-e <dir>] <dir>
-# Installs a package into an environment
+# [-e <env>]
+# Lists known packages in <env>
 #
 #   -e, --env <name>      override default profile script
 #                         (default is `tear env`)
 #
 #   -h, --help            show this message
-# 
-# Arguments:
-#
-#   version               this can be a git branch or tag
 
 . $(dirname $0)/tear-common
 
-exit
-
-env="default"
+env=$(_env)
 while [ $# -gt 0 ]; do
 	case "$1" in
 		-e|--env)
@@ -33,11 +27,5 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-tmpdir=$tear_dir/tmp
-mkcd $tmpdir
-
-fido $@
-
-mkcd -p $tear_dir/env/$env
-
-tear link -e $env $(basename $1 .git)
+cd $tear_dir/env/$env/packages
+ls
