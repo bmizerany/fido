@@ -27,5 +27,5 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-cd $tear_dir/env/$env/packages
+cd $tear_dir/env/$env/packages/$1
 ls
