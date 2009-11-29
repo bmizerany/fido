@@ -1,0 +1,37 @@
+#!/bin/sh
+# USAGE
+# [-e <env>]
+# Output env dependecy list
+#
+#   -e, --env <name>      override default profile script
+#                         (default is `tear env`)
+#
+#   -h, --help            show this message
+
+. $(dirname $0)/tear-common
+
+env=$(_env)
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-e|--env)
+			test $# -lt 2 && see_usage "missing argument for $1"
+			env=$2
+			shift; shift
+			;;
+		-h|--help)
+			see_usage
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+cd $tear_dir/env/$env/packages
+
+for dep in $(ls); do
+	url=$(cd $dep && git config remote.origin.url)
+	branch=$(cd $dep && git branch | grep '^*' | awk '{print $2}')
+	version=$(cd $dep && git rev-parse origin/$branch)
+	printf "%s\t%s\t%s\n" "$url" "$branch" "$version"
+done
