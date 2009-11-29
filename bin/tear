@@ -58,7 +58,7 @@ if test $# -gt 0; then
 	elif ! test -x $command; then
 		die "$command is not executable"
 	fi
-	$command $@
+	$command "$@"
 else
 	_see_usage
 fi
