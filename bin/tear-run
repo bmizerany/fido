@@ -1,0 +1,41 @@
+#!/bin/sh
+# USAGE
+# [-e <env>] <command> [args]
+# Lists known packages in <env>
+#
+#   -e, --env <name>      override default profile script
+#                         (default is `tear env`)
+#
+#   -h, --help            show this message
+
+. $(dirname $0)/tear-common
+
+env=$(_env)
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-e|--env)
+			test $# -lt 2 && see_usage "missing argument for $1"
+			env=$2
+			shift; shift
+			;;
+		-h|--help)
+			see_usage
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+[ $# -eq 0 ] && see_usage "missing <command> argument"
+
+function replace_path() {
+	echo "$1" | sed "s|$tear_dir/active|$tear_dir/env/$env/staged|"
+}
+
+PATH=$(replace_path $PATH)
+RUBYLIB=$(replace_path $RUBYLIB)
+export PATH RUBYLIB
+
+command=$1; shift
+$command "$@"
