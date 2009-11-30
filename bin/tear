@@ -1,0 +1,100 @@
+#!/bin/sh
+
+USAGE="[-d <dir>][-e <env] <command>
+Global executable and library management
+
+  -e, --env <environment>
+     set the environment (defaults to \`tear env\`)
+
+  -d, --env <directory>
+     override \$TEARDIR with <directory>"
+
+set -e
+
+function requirearg() {
+	[ -z "$2" ] && see_usage "missing argument for $1"
+}
+
+function see_usage() {
+	[ -n "$1" ] && printf "fatal: $1\n\n"
+	die "Usage: $(basename $0) $USAGE"
+}
+
+function die() {
+	echo "$1" >&2
+	exit 1
+}
+
+function subc() {
+	cmd="tear_$1"
+	shift
+	$cmd "$@"
+}
+
+#########################
+# Option parsing / Setup
+#########################
+
+TEARDIR=${TEARDIR:-~/.tear}
+TEARENV=$TEARENV
+
+if [ -z "$TEARENV" -a -L "$TEARACT" ]; then
+	TEARENV=$(readlink $TEARACT | awk -F/ '{print $(NF-1)}')
+fi
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-e|--env)
+			requirearg "$1" "$2"
+			TEARENV="$2"
+			shift; shift
+			;;
+		-d|--tear-dir)
+			requirearg "$1" "$2"
+			TEARDIR="$2"
+			shift; shift
+			;;
+		-*)
+			echo >&2 "unknown option $1"
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+[ $# -eq 0 ] && see_usage "missing <command>"
+
+export TEARENV TEARDIR
+
+TEARACT=$TEARDIR/active
+
+#########################
+# All the magic commands
+#########################
+
+function tear_init() {
+	mkdir -p $TEARACT
+	tear_env_create "base"
+	echo >&2 "So far so good; just do this next"
+	echo ". ~/.profile"
+}
+
+function tear_env() {
+	if [ $# -eq 0 ]; then
+		echo $TEARENV
+	else
+		subc "env_$@"
+	fi
+}
+
+function tear_env_create {
+	envdir=$TEARDIR/env/$TEARENV
+	mkdir -p $envdir/packages $envdir/staged/lib $envdir/staged/bin
+}
+
+function tear_env_ls {
+	ls $TEARDIR/env/$TEARENV | sort -f
+}
+
+subc "$@"
