@@ -6,7 +6,7 @@ Global executable and library management
   -e, --env <environment>
      set the environment (defaults to \`tear env\`)
 
-  -d, --env <directory>
+  -d, --tear-dir <directory>
      override \$TEARDIR with <directory>"
 
 set -e
@@ -74,10 +74,20 @@ TEARACT=$TEARDIR/active
 #########################
 
 function tear_init() {
-	mkdir -p $TEARACT
+	mkdir -p $TEARDIR
 	tear_env_create "base"
+
+	conf="# TEAR
+TEARDIR=$TEARDIR
+TEARACT=$TEARACT
+PATH=\$TEARACT/bin:\$PATH
+RUBYLIB=$TEARACT/lib:\$RUBYLIB
+export TEARDIR TEARACT PATH RUBYLIB
+# end TEAR"
+
+	echo "$conf" >> ~/.bashrc
 	echo >&2 "So far so good; just do this next"
-	echo ". ~/.profile"
+	echo ". ~/.bashrc"
 }
 
 function tear_env() {
@@ -89,12 +99,21 @@ function tear_env() {
 }
 
 function tear_env_create {
-	envdir=$TEARDIR/env/$TEARENV
+	[ -z "$1" ] && echo >&2 "fatal: missing env name" && exit 1
+	envdir=$TEARDIR/env/$1
 	mkdir -p $envdir/packages $envdir/staged/lib $envdir/staged/bin
+	tear_env_use $1
+}
+
+function tear_env_use {
+	[ -z "$1" ] && echo >&2 "fatal: missing env name" && exit 1
+
+	rm -f $TEARACT
+	ln -s $TEARDIR/env/$1/staged $TEARACT
 }
 
 function tear_env_ls {
-	ls $TEARDIR/env/$TEARENV | sort -f
+	ls $TEARDIR/env/$TEARENV/packages/$1 | sort -f
 }
 
 subc "$@"
